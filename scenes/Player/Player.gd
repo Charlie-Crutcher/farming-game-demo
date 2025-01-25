@@ -5,223 +5,189 @@ extends CharacterBody2D
 @onready var tool_sprite = $ToolSprite2D
 
 #Audio
-@onready var footsteps_sfx = $Footsteps
-@onready var hit_sfx = $Hit
+@onready var footsteps_sfx : AudioStreamPlayer = $Footsteps
+@onready var hit_sfx : AudioStreamPlayer = $Hit
 
-const speed = 150.0
-var direction_x: float
-var direction_y: float
+#Timer
+@onready var timer: Timer = $Timer
 
-var current_direction = PLAYER_DIRECTION.DOWN
-enum PLAYER_DIRECTION {
-	UP,
-	DOWN,
-	LEFT,
-	RIGHT
-}
+#Movement Variables
+const player_speed = 150.0
+var player_direction_x: float
+var player_direction_y: float
 
+#Action Variables
+var player_action_left
+var player_action_right
+var player_action_up
+var player_action_down
+
+#StateMachine Variable
 var main_sm: LimboHSM
 
+#----------Start of Ready Function----------#
 func _ready():
 	initiate_state_machine()
+#----------End of Ready Function----------#
 
-func _input(event):
-	direction_x = Input.get_axis("MoveLeft", "MoveRight")
-	direction_y = Input.get_axis("MoveUp", "MoveDown")
-
-func direction_result():
-	match current_direction:
-		PLAYER_DIRECTION.UP:
-			animation_sprite.play("idle_up")
-
-func _physics_process(delta):
+#----------Start of Physics Process Function----------#
+func _physics_process(_delta):
+	#Checking for movement and applying gravity
+	
+	#Setting player_direction variables to store if player is pressing left, right, up or down
+	player_direction_x = Input.get_action_strength("MoveRight") - Input.get_action_strength("MoveLeft")
+	player_direction_y = Input.get_action_strength("MoveDown") - Input.get_action_strength("MoveUp")
+	
+	#Setting player_action variables to store if player is using directional keys
+	player_action_left = Input.is_action_pressed("ui_left")
+	player_action_right = Input.is_action_pressed("ui_right")
+	player_action_up = Input.is_action_pressed("ui_up")
+	player_action_down = Input.is_action_pressed("ui_down")
+	
+	##If player is pressing left or right, move the player. If not, velocity = 0
+	# // // // Update: Moved this within walking states in state machine // // // #
+	#if player_direction_x:
+		#velocity.x = player_direction_x * player_speed
+	#else:
+		#velocity.x = 0
+	
+	#Same logic applies for y axis
+	#if player_direction_y:
+		#velocity.y = player_direction_y * player_speed
+	#else:
+		#velocity.y = 0
+	
+	#Adds movement to the player
 	move_and_slide()
+#----------End of Physics Process Function----------#
 
-func flip_sprite(direction_x):
-	if direction_x == 1:
-		animation_sprite.flip_h = false
-		tool_sprite.flip_h = false
-	elif direction_x == -1:
-		animation_sprite.flip_h = true
-		tool_sprite.flip_h = true
-
+#----------Start of Initiate State Machine Function----------#
 func initiate_state_machine():
 	main_sm = LimboHSM.new()
 	add_child(main_sm)
 	
-	# Declare states here for the State Machine
-	var idle_down_state = LimboState.new().named("idle_down").call_on_enter(idle_down_start).call_on_update(idle_down_update)
-	var idle_up_state = LimboState.new().named("idle_up").call_on_enter(idle_up_start).call_on_update(idle_up_update)
-	var idle_horizontal_state = LimboState.new().named("idle_horizontal").call_on_enter(idle_horizontal_start).call_on_update(idle_horizontal_update)
-	var walk_horizontal_state = LimboState.new().named("walk_horizontal").call_on_enter(walk_horizontal_start).call_on_update(walk_horizontal_update)
-	var walk_up_state = LimboState.new().named("walk_up").call_on_enter(walk_up_start).call_on_update(walk_up_update)
-	var walk_down_state = LimboState.new().named("walk_down").call_on_enter(walk_down_start).call_on_update(walk_down_update)
-	var hoe_ground_state = LimboState.new().named("hoe_ground").call_on_enter(hoe_ground_start).call_on_update(hoe_ground_update)
-	var pickaxe_horizontal_state = LimboState.new().named("pickaxe_horizontal").call_on_enter(pickaxe_horizontal_start).call_on_update(pickaxe_horizontal_update)
-	var pickaxe_down_state = LimboState.new().named("pickaxe_down").call_on_enter(pickaxe_down_start).call_on_update(pickaxe_down_update)
-	var pickaxe_up_state = LimboState.new().named("pickaxe_up").call_on_enter(pickaxe_up_start).call_on_update(pickaxe_up_update)
+	#==Declaring new states==#
+	var idle_state = LimboState.new().named("idle").call_on_enter(idle_start).call_on_update(idle_update)
+	var walk_x_state = LimboState.new().named("walk_x").call_on_enter(walk_x_start).call_on_update(walk_x_update)
+	var walk_y_state = LimboState.new().named("walk_y").call_on_enter(walk_y_start).call_on_update(walk_y_update)
+	var pickaxe_state = LimboState.new().named("pickaxe").call_on_enter(pickaxe_start).call_on_update(pickaxe_update)
 	
-	# Adds states into the SM
-	main_sm.add_child(idle_down_state)
-	main_sm.add_child(idle_up_state)
-	main_sm.add_child(idle_horizontal_state)
-	main_sm.add_child(walk_horizontal_state)
-	main_sm.add_child(walk_up_state)
-	main_sm.add_child(walk_down_state)
-	main_sm.add_child(hoe_ground_state)
-	main_sm.add_child(pickaxe_horizontal_state)
-	main_sm.add_child(pickaxe_down_state)
-	main_sm.add_child(pickaxe_up_state)
+	#==Adding declared states into the state machine==#
+	main_sm.add_child(idle_state)
+	main_sm.add_child(walk_x_state)
+	main_sm.add_child(walk_y_state)
+	main_sm.add_child(pickaxe_state)
 	
-	# Initial State upon starting game
-	main_sm.initial_state = idle_down_state
+	#==First state player is assigned to==#
+	main_sm.initial_state = idle_state
 	
-	# Transitions between different states
+	#==Transitions between states==#
+	main_sm.add_transition(idle_state, walk_x_state, &"to_walk_x")
+	main_sm.add_transition(idle_state, walk_y_state, &"to_walk_y")
+	main_sm.add_transition(idle_state, pickaxe_state, &"to_pickaxe")
+	
+	#Universal back to idle state
 	main_sm.add_transition(main_sm.ANYSTATE, idle_state, &"state_ended")
 	
-	# 1: Walking State Transitions
-	# 1.1: State Ends
-	# ! TODO - ADD WALK LEFT & WALK RIGHT STATES!
-	# This will store which way the player was last facing!
-	# This way we can play the appropriate idle animation (idle_left, idle_right, idle_up etc.)
-	# Additionally, we can make the player actions such as pickaxe swing depending on which way they are facing!
-	# GUNGA GINGA BUG BUG BUG TODO TODO TODO !!!!!!!
-	main_sm.add_transtion(walk_up_state, idle_up_state, &"walk_up_to_idle_up")
-	main_sm.add_transition(walk_down_state, idle_down_state, &"walk_down_to_idle_down")
-	main_sm.add_transition(walk_left_state, )
-	
-	main_sm.add_transition(idle_down_state, walk_horizontal_state, &"idle_down_to_walk_horizontal")
-	main_sm.add_transition(idle_up_state, walk_horizontal_state, &"idle_up_to_walk_horizontal")
-	main_sm.add_transition(idle_horizontal_state, walk_horizontal_state, &"idle_horizontal_to_walk_horizontal")
-	main_sm.add_transition(idle_down_state, walk_up_state, &"idle_down_to_walk_up")
-	main_sm.add_transition(idle_up_state, walk_up_state, &"idle_up_to_walk_up")
-	main_sm.add_transition(idle_horizontal_state, walk_up_state, &"idle_horizontal_to_walk_up")
-	main_sm.add_transition(idle_down_state, walk_down_state, &"idle_down_to_walk_down")
-	main_sm.add_transition(idle_up_state, walk_down_state, &"idle_up_to_walk_down")
-	main_sm.add_transition(idle_horizontal_state, walk_down_state, &"idle_horizontal_to_walk_down")
-	main_sm.add_transition(idle_state, pickaxe_horizontal_state, &"to_pickaxe_horizontal")
-	main_sm.add_transition(idle_state, pickaxe_up_state, &"to_pickaxe_up")
-	main_sm.add_transition(idle_state, pickaxe_down_state, &"to_pickaxe_down")
-	
+	#==Initialises StateMachine==#
 	main_sm.initialize(self)
 	main_sm.set_active(true)
-	
-	
+#----------End of Initiate State Machine Function----------#
+
+#----------Start of Movement State Functions----------#
 func idle_start():
-	print("State achine: idle_start")
+	print("StateMachine: idle_state")
 	animation_sprite.play("idle")
-	
-func idle_update(delta : float):
-	print("StateMachine: idle_update")
-	if direction_x:
-		main_sm.dispatch(&"to_walk_horizontal")
-	if direction_y < 0:
-		main_sm.dispatch(&"to_walk_up")
-	if direction_y > 0:
-		main_sm.dispatch(&"to_walk_down")
-	if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
-		main_sm.dispatch(&"to_pickaxe_horizontal")
-	if direction_y and Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
-		main_sm.dispatch(&"to_pickaxe_up")
+func idle_update(_delta : float):
+	#Checks for movement and changes state depending on player direction
+	if player_direction_x:
+		main_sm.dispatch(&"to_walk_x")
+	if player_direction_y:
+		main_sm.dispatch(&"to_walk_y")
+	if player_action_left or player_action_right or player_action_up or player_action_down:
+		timer.start()
+		main_sm.dispatch(&"to_pickaxe")
 
-
-
-func walk_horizontal_start():
-	print("StateMachine: walk_horizontal_start")
+func walk_x_start():
+	print("StateMachine: walk_x_state")
+	footsteps_sfx.play()
 	animation_sprite.play("walk_horizontal")
-	if footsteps_sfx.is_playing(): 
-		pass
-	else:
-		footsteps_sfx.play()
-
-
-
-func walk_horizontal_update(delta : float):
-	print("StateMachine: walk_horizontal_update")
-	if direction_x:
-		velocity.x = direction_x * speed
+	#Flips sprite depending on which direction player is heading on the x axis
+func walk_x_update(_delta : float):
+	#This is where the new movement is for x axis!
+	if player_direction_x == 1:
+		animation_sprite.flip_h = false
+		velocity.x = player_direction_x * player_speed
+	elif player_direction_x == -1:
+		animation_sprite.flip_h = true
+		velocity.x = player_direction_x * player_speed
 	else:
 		velocity.x = 0
-	flip_sprite(direction_x)
+	#If there is no movement, dispatch the universal 'state_ended' state transition
 	if velocity.x == 0:
 		footsteps_sfx.stop()
 		main_sm.dispatch(&"state_ended")
 
-
-
-func walk_up_start():
-	print("StateMachine: walk_up_start")
-	animation_sprite.play("walk_up")
-	if footsteps_sfx.is_playing(): 
-		pass
-	else:
-		footsteps_sfx.play()
-
-
-
-func walk_up_update(delta : float):
-	print("StateMachine: walk_up_update")
-	if direction_y < 0:
-		velocity.y = direction_y * speed
+func walk_y_start():
+	print("StateMachine: walk_y_state")
+	footsteps_sfx.play()
+	#Changes animation depending on which direction player is heading in on the y axis
+func walk_y_update(_delta : float):
+	#This is where the new movement is for y axis!
+	if player_direction_y == 1:
+		animation_sprite.play("walk_down")
+		velocity.y = player_direction_y * player_speed
+	elif player_direction_y == -1:
+		animation_sprite.play("walk_up")
+		velocity.y = player_direction_y * player_speed
 	else:
 		velocity.y = 0
+	#If there is no movement, dispatch the universal 'state_ended' state transition
 	if velocity.y == 0:
 		footsteps_sfx.stop()
 		main_sm.dispatch(&"state_ended")
 
-
-
-func walk_down_start():
-	print("StateMachine: walk_down_start")
-	animation_sprite.play("walk_down")
-	if footsteps_sfx.is_playing(): 
-		pass
-	else:
-		footsteps_sfx.play()
-
-
-
-func walk_down_update(delta : float):
-	print("StateMachine: walk_down_update")
-	if direction_y > 0:
-		velocity.y = direction_y * speed
-	else:
-		velocity.y = 0
-	if velocity.y == 0:
-		footsteps_sfx.stop()
-		main_sm.dispatch(&"state_ended")
-
-
-
-func hoe_ground_start():
-	pass
-func hoe_ground_update(delta : float):
-	pass
-
-
-# =----- Pickaxe States -----= #
-func pickaxe_horizontal_start():
-	print("StateMachine: pickaxe_horizontal_start")
-	flip_sprite(direction_x)
-	tool_sprite.show()
-	tool_sprite.play("pickaxe_horizontal")
-	animation_sprite.play("mine_horizontal")
+func pickaxe_start():
+	print("StateMachine: pickaxe_state")
+	velocity.x = 0
+	velocity.y = 0
 	hit_sfx.play()
-	
-func pickaxe_horizontal_update(delta : float):
-	print("StateMachine: pickaxe_horizontal_update")
-	await tool_sprite.animation_finished
-	tool_sprite.hide()
-	main_sm.dispatch(&"state_ended")
-	
-func pickaxe_up_start():
-	pass
+func pickaxe_update(_delta : float):
+	#Stops playing moving
+	velocity.x = 0
+	velocity.y = 0
+	#Directional Sprite Movement Based on player input
+	if player_action_left:
+		tool_sprite.flip_h = true
+		animation_sprite.flip_h = true
+		tool_sprite.show()
+		tool_sprite.play("pickaxe_horizontal")
+		animation_sprite.play("mine_horizontal")
+	if player_action_right:
+		tool_sprite.flip_h = false
+		animation_sprite.flip_h = false
+		tool_sprite.show()
+		tool_sprite.play("pickaxe_horizontal")
+		animation_sprite.play("mine_horizontal")
+	if player_action_up:
+		tool_sprite.flip_h = false
+		animation_sprite.flip_h = false
+		tool_sprite.show()
+		tool_sprite.play("pickaxe_up")
+		animation_sprite.play("mine_up")
+	if player_action_down:
+		tool_sprite.flip_h = false
+		animation_sprite.flip_h = false
+		tool_sprite.show()
+		tool_sprite.play("pickaxe_down")
+		animation_sprite.play("mine_down")
+	if timer.is_stopped():
+		hit_sfx.stop()
+		tool_sprite.hide()
+		main_sm.dispatch(&"state_ended")
+#----------End of Movement State Functions----------#
 
-func pickaxe_up_update(delta : float):
+#-----Timer Timeout Function-----#
+func _on_timer_timeout():
 	pass
-
-func pickaxe_down_start():
-	pass
-
-func pickaxe_down_update(delta : float):
-	pass
+#-----Timer Timeout Function-----#

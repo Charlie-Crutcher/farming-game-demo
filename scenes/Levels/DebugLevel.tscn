@@ -1,4 +1,4 @@
-[gd_scene load_steps=31 format=3 uid="uid://cumpssmaaab41"]
+[gd_scene load_steps=32 format=3 uid="uid://cumpssmaaab41"]
 
 [ext_resource type="TileSet" uid="uid://gvji6cp27siv" path="res://tres/grass_tilemap.tres" id="1_m0jfg"]
 [ext_resource type="PackedScene" uid="uid://b68ha3p51sfe3" path="res://scenes/Player/Player.tscn" id="1_wunwv"]
@@ -983,6 +983,9 @@ sources/9 = SubResource("TileSetAtlasSource_benqi")
 sources/10 = SubResource("TileSetAtlasSource_c5dap")
 sources/11 = SubResource("TileSetAtlasSource_cwqb6")
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_y5gp1"]
+size = Vector2(213, 23)
+
 [node name="DebugLevel" type="Node2D"]
 
 [node name="Grass" type="TileMap" parent="."]
@@ -1011,3 +1014,11 @@ layer_0/tile_data = PackedInt32Array(393251, 131073, 0, 393252, 131073, 0, 39325
 
 [node name="Player2" parent="." instance=ExtResource("1_wunwv")]
 position = Vector2(54, 31)
+
+[node name="Node" type="Node" parent="."]
+
+[node name="Fences" type="StaticBody2D" parent="Node"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Node/Fences"]
+position = Vector2(1129.5, 515.5)
+shape = SubResource("RectangleShape2D_y5gp1")
