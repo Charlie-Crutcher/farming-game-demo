@@ -3,6 +3,7 @@ class_name Entity
 
 #Stats custom resource
 @export var stats : Stats
+@export var soil : FarmField
 
 #Animations & Sprites
 @onready var animation_sprite = $AnimatedSprite2D
@@ -16,9 +17,11 @@ class_name Entity
 @onready var timer: Timer = $Timer
 
 #Movement Variables
-const player_speed = 150.0
+const player_sprint_speed = 400.0
+const player_speed = 200.0
 var player_direction_x: float
 var player_direction_y: float
+var is_sprinting : bool = false
 var debug_menu
 
 #Action Variables
@@ -48,6 +51,7 @@ func _physics_process(_delta):
 	player_action_right = Input.is_action_pressed("ui_right")
 	player_action_up = Input.is_action_pressed("ui_up")
 	player_action_down = Input.is_action_pressed("ui_down")
+	is_sprinting = Input.is_action_pressed("shift")
 	
 	#Debug menu
 	debug_menu = Input.is_action_just_pressed("debug")
@@ -127,9 +131,13 @@ func walk_x_update(_delta : float):
 	if player_direction_x == 1:
 		animation_sprite.flip_h = false
 		velocity.x = player_direction_x * player_speed
+		if is_sprinting:
+			velocity.x = player_direction_x * player_sprint_speed
 	elif player_direction_x == -1:
 		animation_sprite.flip_h = true
 		velocity.x = player_direction_x * player_speed
+		if is_sprinting:
+			velocity.x = player_direction_x * player_sprint_speed
 	else:
 		velocity.x = 0
 	#If there is no movement, dispatch the universal 'state_ended' state transition
@@ -146,9 +154,13 @@ func walk_y_update(_delta : float):
 	if player_direction_y == 1:
 		animation_sprite.play("walk_down")
 		velocity.y = player_direction_y * player_speed
+		if is_sprinting:
+			velocity.y = player_direction_y * player_sprint_speed
 	elif player_direction_y == -1:
 		animation_sprite.play("walk_up")
 		velocity.y = player_direction_y * player_speed
+		if is_sprinting:
+			velocity.y = player_direction_y * player_sprint_speed
 	else:
 		velocity.y = 0
 	#If there is no movement, dispatch the universal 'state_ended' state transition

@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_of627")
-player_stamina = 52.0
+player_stamina = 51.0
 player_health = 100.0
 player_damage = 10.0
+tilled_soil = false
