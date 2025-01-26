@@ -1,8 +1,9 @@
-[gd_scene load_steps=72 format=3 uid="uid://b68ha3p51sfe3"]
+[gd_scene load_steps=73 format=3 uid="uid://b68ha3p51sfe3"]
 
 [ext_resource type="Texture2D" uid="uid://bfopp07xj580a" path="res://assets/Sprites/Player/Player_New/Player_Anim/Player_Idle_Run_Death_Anim.png" id="1_dxmtx"]
 [ext_resource type="Script" path="res://scenes/Player/Player.gd" id="1_i7byd"]
 [ext_resource type="Texture2D" uid="uid://cggksrmqothxj" path="res://assets/Sprites/Player/Player_New/Weapons/Iron_Tools.png" id="2_p0ar4"]
+[ext_resource type="Resource" uid="uid://dwkcpverg03fs" path="res://tres/PlayerStats.tres" id="2_tjw1w"]
 [ext_resource type="AudioStream" uid="uid://dy0mf64enr5db" path="res://assets/Sound/SFX/grass_footsteps.wav" id="3_j0851"]
 [ext_resource type="Texture2D" uid="uid://cxiqt0lfj7loe" path="res://assets/Sprites/Player/Player_New/Player_Anim/Player_Actions_Anim.png" id="4_nmvse"]
 [ext_resource type="AudioStream" uid="uid://cpoaa2vaagxn8" path="res://assets/Sound/SFX/hit_effect.wav" id="6_3h5tr"]
@@ -500,6 +501,7 @@ stream_0/weight = 1.0
 
 [node name="Player" type="CharacterBody2D"]
 script = ExtResource("1_i7byd")
+stats = ExtResource("2_tjw1w")
 
 [node name="ToolSprite2D" type="AnimatedSprite2D" parent="."]
 visible = false
@@ -530,7 +532,5 @@ pitch_scale = 0.8
 [node name="Timer" type="Timer" parent="."]
 wait_time = 0.8
 one_shot = true
-
-[node name="Camera2D" type="Camera2D" parent="."]
 
 [connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]

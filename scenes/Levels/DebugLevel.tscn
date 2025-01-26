@@ -1,4 +1,4 @@
-[gd_scene load_steps=32 format=3 uid="uid://cumpssmaaab41"]
+[gd_scene load_steps=33 format=3 uid="uid://cumpssmaaab41"]
 
 [ext_resource type="TileSet" uid="uid://gvji6cp27siv" path="res://tres/grass_tilemap.tres" id="1_m0jfg"]
 [ext_resource type="PackedScene" uid="uid://b68ha3p51sfe3" path="res://scenes/Player/Player.tscn" id="1_wunwv"]
@@ -15,6 +15,7 @@
 [ext_resource type="Texture2D" uid="uid://bb3xqhlg3k6nu" path="res://assets/Sprites/Outdoor decoration/Lanter_Posts.png" id="12_2verb"]
 [ext_resource type="Texture2D" uid="uid://ca2o74xa6j5jp" path="res://assets/Sprites/Outdoor decoration/Outdoor_Decor.png" id="13_vd0l2"]
 [ext_resource type="Texture2D" uid="uid://di2xiky25du8s" path="res://assets/Sprites/House/Buildings/Houses/House_1_2.png" id="14_gkriq"]
+[ext_resource type="PackedScene" uid="uid://cwfwo5nreqf1f" path="res://scenes/Player/EnergyBar.tscn" id="16_sxesa"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_kp21j"]
 texture = ExtResource("14_gkriq")
@@ -988,6 +989,9 @@ size = Vector2(213, 23)
 
 [node name="DebugLevel" type="Node2D"]
 
+[node name="Camera2D" type="Camera2D" parent="."]
+anchor_mode = 0
+
 [node name="Grass" type="TileMap" parent="."]
 scale = Vector2(3, 3)
 tile_set = ExtResource("1_m0jfg")
@@ -1012,8 +1016,8 @@ tile_set = SubResource("TileSet_a8gny")
 format = 2
 layer_0/tile_data = PackedInt32Array(393251, 131073, 0, 393252, 131073, 0, 393250, 65537, 0, 393253, 131073, 0, 393254, 131073, 0, 393255, 131073, 0, 655395, 131073, 0, 655396, 131073, 0, 655397, 131073, 0, 655398, 131073, 0, 655399, 131073, 0, 655394, 1, 2, 327701, 131079, 6, 589829, 131081, 0, 983076, 131081, 1, 1310747, 262153, 2, 917518, 262153, 0, 1114141, 131073, 0, 1376269, 131081, 0, 1310722, 9, 0, 1114118, 65545, 0, 1310728, 196617, 0, 786435, 262153, 2, 524302, 131081, 2, 196610, 327689, 0, 5, 131081, 1, 393226, 131081, 2, 131085, 131081, 1, 196623, 262153, 2, 65565, 131081, 0, 393241, 9, 1, 458784, 196617, 0, 131097, 9, 1, 131110, 327689, 0, 327712, 9, 2, 36, 65545, 2, 852002, 65545, 1, 1376294, 65545, 0, 1376288, 327689, 0, 1179681, 9, 0, 983064, 262153, 1, 1310738, 131081, 0, 1048593, 65545, 0, 786451, 327689, 0, 720907, 262153, 2, 1114123, 9, 2, 655381, 65537, 1, 655382, 131073, 0, 655383, 131073, 0, 655384, 131073, 0, 655385, 196609, 0, 655387, 65537, 0, 655388, 131073, 0, 655389, 131073, 0, 655390, 131073, 0, 655391, 196609, 1, 720927, 1, 0, 786463, 1, 0, 983071, 1, 0, 1048607, 1, 0, 1114143, 196609, 1, 1114142, 131073, 0, 1114140, 131073, 0, 1114139, 65537, 0, 1114137, 196609, 0, 1114136, 131073, 0, 1114135, 131073, 0, 1114134, 131073, 0, 1114133, 65537, 1, 1048597, 1, 0, 983061, 1, 1, 786453, 1, 1, 720917, 1, 1)
 
-[node name="Player2" parent="." instance=ExtResource("1_wunwv")]
-position = Vector2(54, 31)
+[node name="Player" parent="." instance=ExtResource("1_wunwv")]
+position = Vector2(951, 392)
 
 [node name="Node" type="Node" parent="."]
 
@@ -1022,3 +1026,7 @@ position = Vector2(54, 31)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Node/Fences"]
 position = Vector2(1129.5, 515.5)
 shape = SubResource("RectangleShape2D_y5gp1")
+
+[node name="EnergyBar" parent="." instance=ExtResource("16_sxesa")]
+position = Vector2(225, 122)
+scale = Vector2(3.5, 3.5)

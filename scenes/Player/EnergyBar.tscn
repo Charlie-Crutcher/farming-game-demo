@@ -1,0 +1,128 @@
+[gd_scene load_steps=15 format=3 uid="uid://cwfwo5nreqf1f"]
+
+[ext_resource type="Texture2D" uid="uid://b1t5xxayueoag" path="res://assets/Sprites/UI/EnergyBarOutline.png" id="1_1u2fd"]
+[ext_resource type="Script" path="res://scenes/Player/EnergyBar.gd" id="1_6k0sj"]
+[ext_resource type="Texture2D" uid="uid://el1q81e5ni13" path="res://assets/Sprites/UI/EnergyBar.png" id="1_6750j"]
+[ext_resource type="Resource" uid="uid://dwkcpverg03fs" path="res://tres/PlayerStats.tres" id="2_t5qg8"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_spylf"]
+atlas = ExtResource("1_6750j")
+region = Rect2(0, 0, 105, 36)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7daqn"]
+atlas = ExtResource("1_6750j")
+region = Rect2(315, 216, 105, 36)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_wcr71"]
+atlas = ExtResource("1_6750j")
+region = Rect2(735, 0, 105, 36)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_i5hyx"]
+atlas = ExtResource("1_6750j")
+region = Rect2(630, 0, 105, 36)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_busj1"]
+atlas = ExtResource("1_6750j")
+region = Rect2(525, 0, 105, 36)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_nmtkd"]
+atlas = ExtResource("1_6750j")
+region = Rect2(420, 0, 105, 36)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_as0bu"]
+atlas = ExtResource("1_6750j")
+region = Rect2(315, 0, 105, 36)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_mf4ns"]
+atlas = ExtResource("1_6750j")
+region = Rect2(210, 0, 105, 36)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_iirws"]
+atlas = ExtResource("1_6750j")
+region = Rect2(105, 0, 105, 36)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_1egdf"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_spylf")
+}],
+"loop": true,
+"name": &"max_stamina",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7daqn")
+}],
+"loop": true,
+"name": &"min_stamina",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_wcr71")
+}],
+"loop": true,
+"name": &"stamina_45",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_i5hyx")
+}],
+"loop": true,
+"name": &"stamina_46",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_busj1")
+}],
+"loop": true,
+"name": &"stamina_47",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_nmtkd")
+}],
+"loop": true,
+"name": &"stamina_48",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_as0bu")
+}],
+"loop": true,
+"name": &"stamina_49",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_mf4ns")
+}],
+"loop": true,
+"name": &"stamina_50",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_iirws")
+}],
+"loop": true,
+"name": &"stamina_51",
+"speed": 5.0
+}]
+
+[node name="EnergyBar" type="Node2D"]
+script = ExtResource("1_6k0sj")
+stats = ExtResource("2_t5qg8")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_1u2fd")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_1egdf")
+animation = &"stamina_49"

@@ -1,4 +1,8 @@
 extends CharacterBody2D
+class_name Entity
+
+#Stats custom resource
+@export var stats : Stats
 
 #Animations & Sprites
 @onready var animation_sprite = $AnimatedSprite2D
@@ -15,12 +19,14 @@ extends CharacterBody2D
 const player_speed = 150.0
 var player_direction_x: float
 var player_direction_y: float
+var debug_menu
 
 #Action Variables
 var player_action_left
 var player_action_right
 var player_action_up
 var player_action_down
+var player_is_mining : bool = false
 
 #StateMachine Variable
 var main_sm: LimboHSM
@@ -33,7 +39,6 @@ func _ready():
 #----------Start of Physics Process Function----------#
 func _physics_process(_delta):
 	#Checking for movement and applying gravity
-	
 	#Setting player_direction variables to store if player is pressing left, right, up or down
 	player_direction_x = Input.get_action_strength("MoveRight") - Input.get_action_strength("MoveLeft")
 	player_direction_y = Input.get_action_strength("MoveDown") - Input.get_action_strength("MoveUp")
@@ -44,6 +49,10 @@ func _physics_process(_delta):
 	player_action_up = Input.is_action_pressed("ui_up")
 	player_action_down = Input.is_action_pressed("ui_down")
 	
+	#Debug menu
+	debug_menu = Input.is_action_just_pressed("debug")
+	if debug_menu:
+		print(stats.player_stamina)
 	##If player is pressing left or right, move the player. If not, velocity = 0
 	# // // // Update: Moved this within walking states in state machine // // // #
 	#if player_direction_x:
@@ -104,9 +113,9 @@ func idle_update(_delta : float):
 		main_sm.dispatch(&"to_walk_x")
 	if player_direction_y:
 		main_sm.dispatch(&"to_walk_y")
-	if player_action_left or player_action_right or player_action_up or player_action_down:
-		timer.start()
-		main_sm.dispatch(&"to_pickaxe")
+	if !tool_sprite.is_playing() and !player_is_mining:
+		if player_action_left or player_action_right or player_action_up or player_action_down:
+			main_sm.dispatch(&"to_pickaxe")
 
 func walk_x_start():
 	print("StateMachine: walk_x_state")
@@ -151,37 +160,47 @@ func pickaxe_start():
 	print("StateMachine: pickaxe_state")
 	velocity.x = 0
 	velocity.y = 0
+	timer.start()
 	hit_sfx.play()
 func pickaxe_update(_delta : float):
 	#Stops playing moving
 	velocity.x = 0
 	velocity.y = 0
 	#Directional Sprite Movement Based on player input
-	if player_action_left:
+	if player_action_left and !player_is_mining:
+		stats.reduce_stamina_1(1.0)
+		player_is_mining = true
 		tool_sprite.flip_h = true
 		animation_sprite.flip_h = true
 		tool_sprite.show()
 		tool_sprite.play("pickaxe_horizontal")
 		animation_sprite.play("mine_horizontal")
-	if player_action_right:
+	elif player_action_right and !player_is_mining:
+		stats.reduce_stamina_1(1.0)
+		player_is_mining = true
 		tool_sprite.flip_h = false
 		animation_sprite.flip_h = false
 		tool_sprite.show()
 		tool_sprite.play("pickaxe_horizontal")
 		animation_sprite.play("mine_horizontal")
-	if player_action_up:
+	elif player_action_up and !player_is_mining:
+		stats.reduce_stamina_1(1.0)
+		player_is_mining = true
 		tool_sprite.flip_h = false
 		animation_sprite.flip_h = false
 		tool_sprite.show()
 		tool_sprite.play("pickaxe_up")
 		animation_sprite.play("mine_up")
-	if player_action_down:
+	elif player_action_down and !player_is_mining:
+		stats.reduce_stamina_1(1.0)
+		player_is_mining = true
 		tool_sprite.flip_h = false
 		animation_sprite.flip_h = false
 		tool_sprite.show()
 		tool_sprite.play("pickaxe_down")
 		animation_sprite.play("mine_down")
 	if timer.is_stopped():
+		player_is_mining = false
 		hit_sfx.stop()
 		tool_sprite.hide()
 		main_sm.dispatch(&"state_ended")
